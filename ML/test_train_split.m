@@ -1,6 +1,13 @@
 function [ testSet, trainingSet ] = test_train_split(dataMatrix,N)
-%Creates a test set and training set for the data
+%{Creates a test set and training set for the data
+%INPUT: 
+    %dataMatrix: the features extracted earlier
+    %N, the number of users
+%OUTPUT:   
+    %testSet: Random subset of dataMatrix (20%)
+    %trainingSet: Random subset of dataMatrix(80%)
 
+%}
 
 userLength = zeros(3,N+1); %stores the number of samples, starting index, and ending index for each user
 for i = 0:N
@@ -19,7 +26,7 @@ testNumber = round(0.2*minimum);   % 20% for test set
 trainNumber = minimum - testNumber; % 80% for training set
 
 
-dataMatrix(:,[2,13,32:34]) = [];   %Eliminates columns of userID, Doc ID, PhoneID
+%dataMatrix(:,[2,13,32:34]) = [];   %Eliminates columns of userID, Doc ID, PhoneID
 matrixSize = size(dataMatrix);
 
 %creates blank matrices with number of columns equal to number of features
