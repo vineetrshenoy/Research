@@ -24,6 +24,8 @@ for i = 1:N
 end
 
 
+% The following code finds the average vectors for users in the set
+
 matrixSize = size(test);
 %Create a blank matrix that will hold the average vector for a certain user 
 averageSet = zeros(N, matrixSize(2) );	
@@ -31,8 +33,10 @@ averageSet = zeros(N, matrixSize(2) );
 
 v = zeros(1,matrixSize(2));
 averageLength = length(userLength);	
-for i = 1:length(averageSet(:,1))
+N = length(averageSet(:,1));
+for i = 1:N
 	
+	v = zeros(1,matrixSize(2));	
 
 	%Sum all the vectors for a certain user
 	for j = userLength(2,i) : userLength(3,i)
@@ -44,15 +48,51 @@ for i = 1:length(averageSet(:,1))
 	a = userLength(1,i);
 	v = v ./ userLength(1,i); %divide by the numbers of vectors
 	averageSet(i,:) = v;		%Assign to location i in th average set
-	v = zeros(1,matrixSize(2));	
+	
+end
 
+for i = 1:41
+	averageSet(i,1) = i;	
 end
 
 
+%Performing the norm calculation
+accuracyVector = zeros(1, 41);
+accuracy = 0;
+minIndex = 0;
+M = length(averageSet(:,1));  %Length of the set of average vectors
+N = length(train(:,1));		%Length of the training set
+count = 0;
+
+%For every vector in the average test set
+for i = 1:M
+
+	minIndex = 1;
+	minNorm = 10^9;
+	x = averageSet(i,:);
+
+	for j = 1:N
+		y = train(j,:);
+		normValue =  norm(x-y);
+		if (normValue < minNorm)
+			minNorm = normValue;
+			minIndex = j;
+		end
 
 
-accuracy = averageSet;
+	end
 
+	accuracyVector(i) = fullMatrix(minIndex,1);
+	if (i == accuracyVector(i))
+		accuracy = accuracy + 1;
+	end
+
+
+
+
+end
+
+l = 9;	
 
 
 end

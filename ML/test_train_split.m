@@ -9,17 +9,19 @@ function [ testSet, trainingSet ] = test_train_split(dataMatrix,N)
 
 %}
 
-userLength = zeros(3,N+1); %stores the number of samples, starting index, and ending index for each user
-for i = 0:N
+userLength = zeros(3,N); %stores the number of samples, starting index, and ending index for each user
+for i = 1:N
     userIndex = find(dataMatrix(:,1) == i);      % Finds the indices of every row for a certain user
     %Finds the minimum and maximum of indices length
     minimum = min(userIndex);
     maximum = max(userIndex);
     
-    userLength(1,i+1) = maximum - minimum + 1;   
-    userLength(2,i+1) = minimum;
-    userLength(3,i+1) = maximum;
+    userLength(1,i) = maximum - minimum + 1;   
+    userLength(2,i) = minimum;
+    userLength(3,i) = maximum;
 end
+
+
 
 minimum = min(userLength(1,:)); %Find the minimum number of samples for a user; reference point
 testNumber = round(0.2*minimum);   % 20% for test set
