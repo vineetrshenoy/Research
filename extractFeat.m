@@ -46,7 +46,7 @@ col_theta = 13;
 
 
 % number of extracted features
-Nfeat = 52;
+Nfeat = 56;
 
 
 % feature descriptors
@@ -89,7 +89,7 @@ featureStr{35} = 'rho start';
 featureStr{36} = 'theta  start';
 featureStr{37} = 'rho end';
 featureStr{38} = 'theta end';
-fingereatureStr{39} = '20\% drho/dt';
+featureStr{39} = '20\% drho/dt';
 featureStr{40} = '50\% drho/dt';
 featureStr{41} = '80\% drho/dt';
 featureStr{42} = '20\% dtheta/dt';
@@ -126,7 +126,7 @@ pixTommFac = pixTommFac * 25.4;
 % toolbox:
 % http://www.mathworks.com/matlabcentral/fileexchange/10676-circular-statistics-toolbox-directional-statistics
 % add your local path of the toolbox here after installation
-addpath('..\..\..\shared_codeRep\CircStat2011f')
+addpath('/home/vshenoy/Rutgers/Research/circstat');
 
 
 
@@ -426,6 +426,9 @@ end
 
 % delete NaNs
 featMat(isnan(featMat)) = 0;
+%VS>
+featMat(isinf(featMat)) = 0;
+%<VS
 
 
 
