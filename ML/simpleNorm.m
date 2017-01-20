@@ -34,7 +34,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %The following code finds the average vectors for users in the set
-%{
+
 matrixSize = size(test);    %rows by columns
 
 %Create a blank matrix that will hold the average vector for a certain user 
@@ -48,16 +48,9 @@ for i = 1:N
 	averageSet(i,:) = userVectors;
 end
 
-averageSet(:,2) = [];
-train(:,2) = [];
-
-for i = 1:length(averageSet(:,1))
-	averageSet(i,1) = i;
-end
-%}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-M = length(train(:,1));			%Number of vectors in the training set
+M = length(averageSet(:,1));			%Number of vectors in the training set
 N = length(test(:,1));			%Number of vectors in the testing set
 
 accuracyVector = zeros(N,1);
