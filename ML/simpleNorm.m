@@ -11,7 +11,7 @@ N = 41;
 
 testLabels = test(:,1:2);
 test(:,1:2) = [];
-test = normr(test);(polar)
+test = normr(test);
 
 trainLabels = train(:,1:2);
 train(:,1:2) = [];
@@ -21,7 +21,7 @@ train = normr(train);
 %Finds the nubmer of strokes for each user
 userLength = zeros(3,N); %stores the number of samples, starting index, and ending index for each user
 for i = 1:N
-    userIndex = find(test(:,1) == i);      % Finds the indices of every row for a certain user
+    userIndex = find(testLabels(:,1) == i);      % Finds the indices of every row for a certain user
     %Finds the minimum and maximum of indices length
     minimum = min(userIndex);
     maximum = max(userIndex);
@@ -31,10 +31,10 @@ for i = 1:N
     userLength(3,i) = maximum;
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %The following code finds the average vectors for users in the set
-
+%{
 matrixSize = size(test);    %rows by columns
 
 %Create a blank matrix that will hold the average vector for a certain user 
@@ -54,17 +54,20 @@ train(:,2) = [];
 for i = 1:length(averageSet(:,1))
 	averageSet(i,1) = i;
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+M = length(train(:,1));			%Number of vectors in the training set
+N = length(test(:,1));			%Number of vectors in the testing set
 
-accuracyVector = zeros(1,41);
+accuracyVector = zeros(N,1);
 accuracy = 0;
 minIndex = 0;
 
-M = length(train(:,1));
+
 for i = 1:N
 	normMin = 10^9;
-	x = averageSet(i,:);
+	x = test(i,:);
 	for j = 1: M
 		value = norm(x - train(j,:));
 		if (value < normMin)
@@ -75,8 +78,8 @@ for i = 1:N
 	end
 	
 
-	accuracyVector(i) = train(minIndex,1);
-	if (i == accuracyVector(i))
+	accuracyVector(i) = trainLabels(minIndex,1);
+	if (testLabels(i,1) == accuracyVector(i))
 		accuracy = accuracy + 1;
 end
 
