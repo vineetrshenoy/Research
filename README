@@ -1,1 +1,31 @@
-This file describes the research that is being done for touch-gesture swipes
+This file describes the research that is being done for touch-gesture swipes. The following files are on the GitHub
+
+vineetrshenoy/Research
+
+ColumnLabels.xlsx: Contains the column labels for the full matrix, as well as the labels for the polar matrix and cartesian matrix (in separate sheets at the bottom)
+
+
+cartesianMat.mat: The matrix that has cartesian features only. The labels corresponding to each column are found in ColumnLabels.xlsx
+
+extendedFeatures.mat: The matrix containing all features, both polar and cartesian
+
+extractFeat.m: The file that extracts the polar features and adds them to the matrix. If you call extractFeat.m with the original data, you will get extendedFeatures.mat
+
+extractFeatures.m: The original file from Mario Frank's UC Berkeley site that creates a matrix of cartesian features only
+
+
+polarMat.mat: The matrix that has polar features only. The labels corresponding to each column are found in ColumnLabels.xlsx
+
+
+vineetrshenoy/Research/data
+
+data.csv: The original data from Mario Frank's UC Berkeley site
+
+
+
+vineetrshenoy/Research/ML
+
+test_train_split.m: Creates a testing and training set based on the data
+
+
+simpleNorm.m: performs a basic norm calculations base don the input matrix
