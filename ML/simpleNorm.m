@@ -50,19 +50,20 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-M = length(averageSet(:,1));			%Number of vectors in the training set
+M = length(averageSet(:,1));	%Number of vectors in the training set
 N = length(test(:,1));			%Number of vectors in the testing set
 
-accuracyVector = zeros(N,1);
-accuracy = 0;
+
+accuracyVector = zeros(N,1); %Stores the label corresponding to user for each vector in the test set
+accuracy = 0;				%Number of correctly classifed vectors
 minIndex = 0;
 
-
+%Loop iterating over all vectors in the test set
 for i = 1:N
 	normMin = 10^9;
-	x = test(i,:);
+	x = test(i,:);	%stores vector i in x
 	for j = 1: M
-		value = norm(x - train(j,:));
+		value = norm(x - averageSet(j,:));
 		if (value < normMin)
 			normMin = value;
 			minIndex = j;
@@ -71,7 +72,7 @@ for i = 1:N
 	end
 	
 
-	accuracyVector(i) = trainLabels(minIndex,1);
+	accuracyVector(i) = minIndex;
 	if (testLabels(i,1) == accuracyVector(i))
 		accuracy = accuracy + 1;
 end
