@@ -1,4 +1,4 @@
-function [accuracy] = simpleNorm(fullMatrix)
+function [accuracy,test,train] = simpleNorm(fullMatrix)
 %This function takes a full data matrix, creates a 
 %testing and training set, and computes a simple norm error,
 %It averages the strokes for a user in the test set and computes
