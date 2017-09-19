@@ -28,11 +28,6 @@ testNumber = round(0.2*minimum);   % 20% for test set
 trainNumber = minimum - testNumber; % 80% for training set
 
 
-<<<<<<< Updated upstream
-
-=======
-%dataMatrix(:,[13,32:34]) = [];   %Eliminates columns of userID, Doc ID, PhoneID
->>>>>>> Stashed changes
 matrixSize = size(dataMatrix);
 
 %creates blank matrices with number of columns equal to number of features
