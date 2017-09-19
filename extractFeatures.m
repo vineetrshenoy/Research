@@ -349,9 +349,9 @@ for i = 1:Nstrokes
 end
 
 % delete NaNs
-featMat(isnan(featMat(:,1)),:) = [];
-
-
+%featMat(isnan(featMat(:,1)),:) = [];
+featMat(isnan(featMat)) = 0;
+featMat(isinf(featMat)) = 0;
 
 
 
