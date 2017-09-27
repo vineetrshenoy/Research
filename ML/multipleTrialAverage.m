@@ -3,7 +3,7 @@
 %INPUT: The full matrix, 
 %OUTPUT: graph of the distribution
 
-function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers)
+function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, classifier_type)
 	rng(5);
 	N = numUsers;
 
@@ -31,8 +31,22 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers)
 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-		tree = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 20);
-		accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
+		accuracy_vec = 0;
+		switch classifier_type
+			case 'classification_tree'
+				tree = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 5);
+				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
+			case 'lda_classifier'
+				classifier = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 5);
+				accuracy_vec = treeStrokeDistribution(classifier, numUsers, testSet, testLabels);
+			otherwise
+				a = 5;
+		end
+		
+		
+
+
+
 		super(i,:) = accuracy_vec;
 
 

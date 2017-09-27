@@ -4,7 +4,7 @@
 %INPUT: classifier, testSet, testLabels
 %OUTPUT: accuracy vector
 
-function [accuracy_vec] = treeStrokeDistribution(classifier_tree,numUsers, testSet, testLabels)
+function [accuracy_vec] = ldaStrokeDistribution(classifier,numUsers, testSet, testLabels)
 
 
 N = numUsers;
@@ -25,7 +25,7 @@ for j = 1:N  %From user 1 to user N
 	
 	% Creates the vector of labels for the first 37 strokes
 	for k = predict_start:predict_end 
-		label = predict(classifier_tree.Trained{1}, testSet(k,:));
+		label = predict(classifier.Trained{1}, testSet(k,:));
 		vector_label(count) = label;
 		count = count + 1;
 	end;
@@ -58,22 +58,6 @@ for i = 1:M
 	accuracy_vec(i) = accuracy/N;
 
 end
-
-
-%Graph the distribution
-%{
-figure(1);
-x = 1:M;
-
-hold on;
-title({'Cross-Validated (K = 20) CART decision tree'});
-xlabel({'Number of samples before classification'});
-ylabel('Classification percentage');
-xlim([0 (M + 3)])
-ylim([0 1.1])
-plot(x, accuracy_vec, 'r.', 'MarkerSize', 10);
-hold off;
-%}
 
 
 
