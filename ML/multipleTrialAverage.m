@@ -34,10 +34,10 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 		accuracy_vec = 0;
 		switch classifier_type
 			case 'classification_tree'
-				tree = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 5);
+				tree = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
 				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
 			case 'lda_classifier'
-				classifier = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 5);
+				classifier = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
 				accuracy_vec = treeStrokeDistribution(classifier, numUsers, testSet, testLabels);
 			otherwise
 				a = 5;
@@ -54,6 +54,7 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 
 	avg = mean(super);
 
+	%{
 	figure(1);
 	x = 1:M;
 
@@ -65,5 +66,6 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 	ylim([0 1.1])
 	plot(x, avg, 'r.', 'MarkerSize', 10);
 	hold off;
+	%}
 
 end
