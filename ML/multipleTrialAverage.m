@@ -10,7 +10,7 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 	[testSet,train] = test_train_split(fullMatrix,41);
 	
 	M = length(testSet(:,1))/N; %Number of test vectors per user
-
+	R = length(train(:,1))/N; %Number of train vectors per user
 	super = zeros(numTrials,M);
 
 
@@ -37,10 +37,23 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 				tree = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
 				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
 			case 'lda_classifier'
-				classifier = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
-				accuracy_vec = treeStrokeDistribution(classifier, numUsers, testSet, testLabels);
-			otherwise
-				a = 5;
+				classifier_lda = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
+				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
+			case 'svm_classifier'
+				testLabels(:) = 0;
+				trainLabels(:) = 0;
+
+				train_start =  (i - 1) * R + 1;  %finding the current user start point (train)
+				train_end = train_start + (R - 1);   %find the current user end point (train)
+				trainLabels(train_start:train_end) = 1;		%Setting the new label
+
+				test_start =  (i - 1) * M + 1; %finding the current user start point (test)
+				test_end = test_start + (M - 1); %finding the current user end point (test)
+				testLabels(test_start:test_end) = 1;		%Setting the new label
+
+
+				svm_classifier = fitcsvm(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
+				[accuracy, one_count] = svmStrokeDistribution(svm_classifier, numUsers, i, testSet, testLabels);
 		end
 		
 		
