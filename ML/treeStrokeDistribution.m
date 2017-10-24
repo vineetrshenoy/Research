@@ -24,12 +24,7 @@ for j = 1:N  %From user 1 to user N
 	count = 1;	%Counter to store labels in right place
 	
 	% Creates the vector of labels for the first 37 strokes
-	for k = predict_start:predict_end 
-		label = predict(classifier_tree.Trained{1}, testSet(k,:));
-		vector_label(count) = label;
-		count = count + 1;
-	end;
-
+	vector_label = predict(classifier.Trained{1}, testSet(predict_start:predict_end,:));
 
 	for k = 1:M
 		temp_vec = vector_label(1:k); 	%takes a subset of the vector
@@ -43,17 +38,14 @@ end
 
 
 accuracy_vec = zeros(1,M);	%stores the accuracy for each user based on the number of strokes
-
+user_labels = 1:N;
+user_labels = transpose(user_labels);
 for i = 1:M
+	
+	col_data = super(:,i);
+	x = (user_labels == col_data);
+	accuracy = sum(x);
 
-	accuracy = 0;
-	for j = 1:N
-
-		if (super(j,i) == j)
-			accuracy = accuracy + 1;
-		end
-
-	end
 
 	accuracy_vec(i) = accuracy/N;
 
