@@ -3,42 +3,58 @@
 %INPUT: The full matrix, 
 %OUTPUT: graph of the distribution
 
-function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, classifier_type)
+function [super, avg] = cimmultipleTrialAverage(fullMatrix, numTrials, numUsers, classifier_type)
 	rng(5);
+	
 	N = numUsers;
 
-	[testSet,train] = test_train_split(fullMatrix,41);
+	[testSet,train, minimum] = imbalance_split(fullMatrix,41);
 	
-	M = length(testSet(:,1))/N; %Number of test vectors per user
-	R = length(train(:,1))/N; %Number of train vectors per user
-	super = zeros(numTrials,M);
+	
+	super = zeros(numTrials,minimum);
 
 
+	userLength = zeros(3,N); %stores the number of samples, starting index, and ending index for each user
 
 	for i = 1:numTrials
 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		[testSet,train] = test_train_split(fullMatrix,41);
+		[testSet,trainSet, minimum] = imbalance_split(fullMatrix,41);
+
+		for i = 1:N
+		    userIndex = find(testSet(:,1) == i);      % Finds the indices of every row for a certain user
+		    %Finds the minimum and maximum of indices length
+		    minimum = min(userIndex);
+		    maximum = max(userIndex);
+		    
+		    userLength(1,i) = maximum - minimum + 1;   
+		    userLength(2,i) = minimum;
+		    userLength(3,i) = maximum;
+		end
+
+
 
 		testLabels = testSet(:,1);
 		testSet(:,1:2) = [];
 		testSet = normr(testSet);
 
 
-		trainLabels = train(:,1);
-		train(:,1:2) = [];
-		train = normr(train);
+		trainLabels = trainSet(:,1);
+		trainSet(:,1:2) = [];
+		trainSet = normr(trainSet);
+
+
 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 		accuracy_vec = 0;
 		switch classifier_type
 			case 'classification_tree'
-				tree = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
-				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
+				tree = fitctree(trainSet, trainLabels, 'CrossVal', 'on', 'KFold', 15);
+				accuracy_vec = cimtreeStrokeDistribution(tree, userLength, testSet, testLabels);
 			case 'lda_classifier'
-				classifier_lda = fitcdiscr(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
-				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
+				classifier_lda = fitcdiscr(trainSet, trainLabels, 'CrossVal', 'on', 'KFold', 15);
+				accuracy_vec = cimldaStrokeDistribution(classifier_lda, userLength, testSet, testLabels);
 			case 'svm_classifier'
 				testLabels(:) = 0;
 				trainLabels(:) = 0;

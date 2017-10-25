@@ -37,7 +37,9 @@ trainingSet = zeros(trainNumber * (N), matrixSize(2));
 for i = 1:N
     userIndex = find(dataMatrix(:,1) == i);         %Finds all rows for a certain user
     %Random indices used for training and testing. The number equls minimum
-    randomIndices = randi([userIndex(1) userIndex(end)],testNumber + trainNumber,1);    
+
+    randomIndices = userIndex(randperm(length(userIndex)));
+    randomIndices = randomIndices(1:(testNumber + trainNumber));    
     %Indices for the testing. Takes 20% * minimum
     testIndices = randomIndices(1:testNumber);      
     randomIndices(1:testNumber) = [];        

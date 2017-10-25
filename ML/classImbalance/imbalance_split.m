@@ -21,7 +21,7 @@ for i = 1:N
     userLength(3,i) = maximum;
     userLength(4,i) = round(0.2*userLength(1,i));
 end
-minimum = min(userLength(1,:));
+minimum = min(userLength(4,:));
 testSum = sum(userLength(4,:));  %gets the sum so that a new matrix can be created
 matrixSize = size(dataMatrix);
 
