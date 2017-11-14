@@ -52,23 +52,6 @@ for i = 1:M
 end
 
 
-%Graph the distribution
-%{
-figure(1);
-x = 1:M;
-
-hold on;
-title({'Cross-Validated (K = 20) CART decision tree'});
-xlabel({'Number of samples before classification'});
-ylabel('Classification percentage');
-xlim([0 (M + 3)])
-ylim([0 1.1])
-plot(x, accuracy_vec, 'r.', 'MarkerSize', 10);
-hold off;
-%}
-
-
-
 
 
 end
