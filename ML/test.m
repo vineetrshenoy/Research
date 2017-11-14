@@ -6,7 +6,7 @@ load('matricesAndStructures/cartMat.mat')
 
 
 x = 1:M;
-
+%{}
 [superOne, avgOne] = multipleTrialAverage(extendedFeatures, 100, 41, 'classification_tree')
 figure(1);
 hold on;
@@ -43,7 +43,7 @@ ylim([0 1.1])
 plot(x, avgThree, 'k.', 'MarkerSize', 10);
 hold off;
 legend('Cartesian')
-
+%}
 
 figure(4);
 hold on;
