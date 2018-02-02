@@ -4,7 +4,7 @@ load('matricesAndStructures/polarMat.mat')
 load('matricesAndStructures/cartMat.mat')
 
 
-
+M = 37;
 x = 1:M;
 %{}
 [superOne, avgOne] = multipleTrialAverage(extendedFeatures, 100, 41, 'classification_tree')
@@ -43,7 +43,7 @@ ylim([0 1.1])
 plot(x, avgThree, 'k.', 'MarkerSize', 10);
 hold off;
 legend('Cartesian')
-%}
+
 
 figure(4);
 hold on;
@@ -57,7 +57,7 @@ plot(x, avgTwo, 'b.')
 plot(x, avgThree, 'k.')
 hold off;
 legend('Polar + Cartesian', 'Polar Only', 'Cartesian Only')
-
+%}
 
 [superFive, avgFive] = multipleTrialAverage(extendedFeatures, 100, 41, 'lda_classifier')
 figure(5);
