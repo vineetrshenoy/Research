@@ -23,11 +23,13 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 		testLabels = testSet(:,1);
 		testSet(:,1:2) = [];
 		testSet = normr(testSet);
+		M = length(testLabels) / numUsers;
 
 
 		trainLabels = train(:,1);
 		train(:,1:2) = [];
 		train = normr(train);
+		R = length(trainLabels) / numUsers;
 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -35,6 +37,7 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 		switch classifier_type
 			case 'classification_tree'
 				tree = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
+				[label,score] = resubPredict(tree.Trained{1});
 				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
 				super(i,:) = accuracy_vec;
 			case 'lda_classifier'
@@ -42,21 +45,43 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
 				super(i,:) = accuracy_vec;
 			case 'svm_classifier'
+
+				[testSet, trainSet, user] = svmSplit(fullMatrix, 41);
+				userTest_indices = find(testSet(:,1) == user);
+				userTrain_indices = find(trainSet(:,1) == user);
+
+				testLabels = testSet(:,1);
+				testSet(:,1:2) = [];
+				testSet = normr(testSet);
+
+				trainLabels = trainSet(:,1);
+				trainSet(:,1:2) = [];
+				trainSet = normr(trainSet);
+
+
 				testLabels(:) = 0;
 				trainLabels(:) = 0;
 
-				train_start =  (i - 1) * R + 1;  %finding the current user start point (train)
-				train_end = train_start + (R - 1);   %find the current user end point (train)
-				trainLabels(train_start:train_end) = 1;		%Setting the new label
-
-				test_start =  (i - 1) * M + 1; %finding the current user start point (test)
-				test_end = test_start + (M - 1); %finding the current user end point (test)
-				testLabels(test_start:test_end) = 1;		%Setting the new label
+				testLabels(userTest_indices) = 1;
+				trainLabels(userTrain_indices) = 1;
 
 
-				svm_classifier = fitcsvm(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
-				[accuracy] = svmStrokeDistribution(svm_classifier, numUsers, i, testSet, testLabels);
-				super(i, 1) = accuracy
+				svm_classifier = fitcsvm(trainSet, trainLabels, 'Standardize',true,'KernelFunction','RBF','KernelScale','auto');
+				svm_classifier = fitPosterior(svm_classifier);
+				[~,score] =  resubPredict(svm_classifier);
+				%[label, score] = predict(svm_classifier, testSet(1:end,:));
+
+				[Xsvm,Ysvm,Tsvm,AUCsvm] = perfcurve(trainLabels,score(:,2),1);
+				plot(Xsvm,Ysvm);
+				xlabel('False Positive Rate');
+				ylabel('True Positive Rate');
+
+
+				%classLoss = kfoldLoss(svm_classifier);
+				[accuracy, far, frr] = svmStrokeDistribution2(svm_classifier, numUsers, 1, testSet, testLabels);
+				super(i, 1) = accuracy;
+				super(i, 2) = far;
+				super(i, 3) = frr;
 		end
 		
 		
