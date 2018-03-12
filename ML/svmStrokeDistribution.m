@@ -30,6 +30,39 @@ super(predict_start:predict_end, 1) = 1;
 
 accuracy = (vec == super);
 
+frr = 0;
+%Calculating the False Rejection Rate
+for i = predict_start:predict_end
+
+	if accuracy(i) == 0
+		frr = frr + 1;
+	end
+
+end
+
+frr = frr/M;
+
+%Calculating the False Acceptance Rate
+far = 0
+for j = 1:predict_start - 1
+
+	if accuracy(j) == 0
+		far = far + 1;
+	end
+
+end
+
+for j = predict_end + 1:length(testSet)
+
+	if accuracy(j) == 0
+		far = far + 1;
+	end
+
+end
+far = far/(A -M);
+
+
+
 accuracy = sum(accuracy);
 accuracy = accuracy/A;
 
