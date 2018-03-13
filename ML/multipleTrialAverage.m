@@ -44,7 +44,7 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 
 
 				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 3);
-
+				figure(1);
 				plot(X,Y)
 				hold on
 				plot(OPTROCPT(1),OPTROCPT(2),'ro')
@@ -52,13 +52,30 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 				ylabel('True positive rate')
 				title('ROC Curve for Classification by Classification Trees')
 				hold off
-
-
-
 				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
 				super(i,:) = accuracy_vec;
+
+
 			case 'lda_classifier'
-				classifier_lda = fitcdiscr(trainSet, trainLabels, 'CrossVal', 'on', 'KFold', 15);
+				classifier_lda = fitcdiscr(trainSet, trainLabels);
+				
+
+
+				[~,score] = resubPredict(classifier_lda);
+				scoreMat = score(:, [1, 3:end]);
+				diffscore = score(:, 2) - max(scoreMat, [], 2);
+
+
+				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 2);
+				figure(1);
+				plot(X,Y)
+				hold on
+				plot(OPTROCPT(1),OPTROCPT(2),'ro')
+				xlabel('False positive rate')
+				ylabel('True positive rate')
+				title('ROC Curve for Classification by LDA')
+				hold off
+
 				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
 				super(i,:) = accuracy_vec;
 			case 'svm_classifier'
