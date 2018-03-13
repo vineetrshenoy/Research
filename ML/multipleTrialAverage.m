@@ -7,10 +7,10 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 	rng(5);
 	N = numUsers;
 
-	[testSet,train] = test_train_split(fullMatrix,41);
+	[testSet,trainSet] = test_train_split(fullMatrix,41);
 	
 	M = length(testSet(:,1))/N; %Number of test vectors per user
-	R = length(train(:,1))/N; %Number of train vectors per user
+	R = length(trainSet(:,1))/N; %Number of train vectors per user
 	super = zeros(numTrials,M);
 
 
@@ -18,7 +18,7 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 	for i = 1:numTrials
 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		[testSet,train] = test_train_split(fullMatrix,41);
+		[testSet,trainSet] = test_train_split(fullMatrix,41);
 
 		testLabels = testSet(:,1);
 		testSet(:,1:2) = [];
@@ -26,9 +26,9 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 		M = length(testLabels) / numUsers;
 
 
-		trainLabels = train(:,1);
-		train(:,1:2) = [];
-		train = normr(train);
+		trainLabels = trainSet(:,1);
+		trainSet(:,1:2) = [];
+		trainSet = normr(trainSet);
 		R = length(trainLabels) / numUsers;
 
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,12 +36,29 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 		accuracy_vec = 0;
 		switch classifier_type
 			case 'classification_tree'
-				tree = fitctree(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
-				[label,score] = resubPredict(tree.Trained{1});
+				tree = fitctree(trainSet, trainLabels);
+		
+				[label,score] = resubPredict(tree);
+				scoreMat = score(:, [1:5, 7:end]);
+				diffscore = score(:, 6) - max(scoreMat, [], 2);
+
+
+				[X,Y,T,AUC,OPTROCPT] = perfcurve(label,diffscore, 6);
+
+				plot(X,Y)
+				hold on
+				plot(OPTROCPT(1),OPTROCPT(2),'ro')
+				xlabel('False positive rate')
+				ylabel('True positive rate')
+				title('ROC Curve for Classification by Classification Trees')
+				hold off
+
+
+
 				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
 				super(i,:) = accuracy_vec;
 			case 'lda_classifier'
-				classifier_lda = fitcdiscr(train, trainLabels, 'CrossVal', 'on', 'KFold', 15);
+				classifier_lda = fitcdiscr(trainSet, trainLabels, 'CrossVal', 'on', 'KFold', 15);
 				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
 				super(i,:) = accuracy_vec;
 			case 'svm_classifier'
@@ -66,12 +83,14 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 				trainLabels(userTrain_indices) = 1;
 
 
-				svm_classifier = fitcsvm(trainSet, trainLabels, 'Standardize',true,'KernelFunction','RBF','KernelScale','auto');
+				svm_classifier = fitcsvm(trainSet, trainLabels, 'Standardize',true, 'KernelFunction', 'rbf', 'KernelScale','auto');
 				svm_classifier = fitPosterior(svm_classifier);
 				[~,score] =  resubPredict(svm_classifier);
 				%[label, score] = predict(svm_classifier, testSet(1:end,:));
 
 				[Xsvm,Ysvm,Tsvm,AUCsvm] = perfcurve(trainLabels,score(:,2),1);
+				figure(i)
+				title(sprintf('Extended Features, Trial %d', i))
 				plot(Xsvm,Ysvm);
 				xlabel('False Positive Rate');
 				ylabel('True Positive Rate');
