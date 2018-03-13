@@ -37,13 +37,13 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 		switch classifier_type
 			case 'classification_tree'
 				tree = fitctree(trainSet, trainLabels);
-		
-				[label,score] = resubPredict(tree);
-				scoreMat = score(:, [1:5, 7:end]);
-				diffscore = score(:, 6) - max(scoreMat, [], 2);
+				
+				[~,score] = resubPredict(tree);
+				scoreMat = score(:, [1:2, 4:end]);
+				diffscore = score(:, 3) - max(scoreMat, [], 2);
 
 
-				[X,Y,T,AUC,OPTROCPT] = perfcurve(label,diffscore, 6);
+				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 3);
 
 				plot(X,Y)
 				hold on
