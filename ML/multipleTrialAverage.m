@@ -82,8 +82,8 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 				%[label, score] = predict(svm_classifier, testSet(1:end,:));
 
 				[X,Y,T,AUC, OPTROCPT] = perfcurve(trainLabels,score(:,2),1);
-				%figure('name', sprintf('%s, trial %d User %d', cType, i, user), 'visible', 'off');
-				figure(1)
+				figure('name', sprintf('%s, trial %d User %d', cType, i, user));
+				%figure(1)
 				plot(X,Y)
 				hold on
 				plot(OPTROCPT(1),OPTROCPT(2),'ro')
