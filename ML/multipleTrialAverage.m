@@ -37,13 +37,13 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 		switch classifier_type
 			case 'classification_tree'
 				tree = fitctree(trainSet, trainLabels);
-				
 				[~,score] = resubPredict(tree);
-				scoreMat = score(:, [1:2, 4:end]);
-				diffscore = score(:, 3) - max(scoreMat, [], 2);
+				plotROC(tree, trainLabels, score, i);
+				scoreMat = score(:, [2:end]);
+				diffscore = score(:, 1) - max(scoreMat, [], 2);
 
-
-				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 3);
+				%{
+				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 1);
 				figure(1);
 				plot(X,Y)
 				hold on
@@ -52,6 +52,7 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 				ylabel('True positive rate')
 				title('ROC Curve for Classification by Classification Trees')
 				hold off
+				%}
 				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
 				super(i,:) = accuracy_vec;
 
