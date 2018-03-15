@@ -118,6 +118,49 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 				super(i, 1) = accuracy;
 				super(i, 2) = far;
 				super(i, 3) = frr;
+
+
+			case 'knn'
+
+				knn_classifer = fitcknn(trainSet, trainLabels, 'NumNeighbors', 20, 'Standardize', 1);
+				
+				[~,score] = resubPredict(knn_classifer);
+				scoreMat = score(:, [1, 3:end]);
+				diffscore = score(:, 2) - max(scoreMat, [], 2);
+
+
+				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 2);
+				figure(1);
+				plot(X,Y)
+				hold on
+				plot(OPTROCPT(1),OPTROCPT(2),'ro')
+				xlabel('False positive rate')
+				ylabel('True positive rate')
+				title('ROC Curve for Classification by k-NN')
+				hold off
+
+
+			case 'nb'
+
+				nb_classifier = fitcnb(trainSet, trainLabels);
+				
+				[~,score] = resubPredict(nb_classifier);
+				scoreMat = score(:, [1:3, 5:end]);
+				diffscore = score(:, 4) - max(scoreMat, [], 2);
+
+
+				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 4);
+				figure(1);
+				plot(X,Y)
+				hold on
+				plot(OPTROCPT(1),OPTROCPT(2),'ro')
+				xlabel('False positive rate')
+				ylabel('True positive rate')
+				title('ROC Curve for Classification by Naive Bayes')
+				hold off
+
+
+
 		end
 		
 		
