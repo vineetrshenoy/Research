@@ -3,7 +3,7 @@
 %INPUT: The full matrix, 
 %OUTPUT: graph of the distribution
 
-function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, classifier_type)
+function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, classifier_type)
 	rng(5);
 	N = numUsers;
 
@@ -11,7 +11,8 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 	
 	M = length(testSet(:,1))/N; %Number of test vectors per user
 	R = length(trainSet(:,1))/N; %Number of train vectors per user
-	super = zeros(numTrials,M);
+	super_acc = zeros(numTrials,M);
+	auc_super = zeros(numTrials, 41);
 
 
 
@@ -35,29 +36,17 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 
 		accuracy_vec = 0;
 		switch classifier_type
-			case 'classification_tree'
+			case 'tree'
 				tree = fitctree(trainSet, trainLabels);
 				[~,score] = resubPredict(tree);
-				plotROC(tree, trainLabels, score, i);
-				scoreMat = score(:, [2:end]);
-				diffscore = score(:, 1) - max(scoreMat, [], 2);
-
-				%{
-				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 1);
-				figure(1);
-				plot(X,Y)
-				hold on
-				plot(OPTROCPT(1),OPTROCPT(2),'ro')
-				xlabel('False positive rate')
-				ylabel('True positive rate')
-				title('ROC Curve for Classification by Classification Trees')
-				hold off
-				%}
+				auc_vec = plotROC(tree, trainLabels, score, i, 'ClassificationTree');
+				auc_super(i, :) = auc_vec;
+				
 				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
-				super(i,:) = accuracy_vec;
+				super_acc(i,:) = accuracy_vec;
 
 
-			case 'lda_classifier'
+			case 'lda'
 				classifier_lda = fitcdiscr(trainSet, trainLabels);
 				
 
@@ -78,8 +67,8 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 				hold off
 
 				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
-				super(i,:) = accuracy_vec;
-			case 'svm_classifier'
+				super_acc(i,:) = accuracy_vec;
+			case 'svm'
 
 				[testSet, trainSet, user] = svmSplit(fullMatrix, 41);
 				userTest_indices = find(testSet(:,1) == user);
@@ -116,9 +105,9 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 
 				%classLoss = kfoldLoss(svm_classifier);
 				[accuracy, far, frr] = svmStrokeDistribution2(svm_classifier, numUsers, 1, testSet, testLabels);
-				super(i, 1) = accuracy;
-				super(i, 2) = far;
-				super(i, 3) = frr;
+				super_acc(i, 1) = accuracy;
+				super_acc(i, 2) = far;
+				super_acc(i, 3) = frr;
 
 
 			case 'knn'
@@ -173,7 +162,7 @@ function [super, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers, cl
 
 	end
 
-	avg = mean(super);
+	avg = mean(super_acc);
 
 	%{
 	figure(1);

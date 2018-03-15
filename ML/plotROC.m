@@ -1,6 +1,6 @@
-function [auc_vec] = plotROC(classifier, trainLabels, score, trialNum)
+function [auc_vec] = plotROC(classifier, trainLabels, score, trialNum, cType)
 
-	mkdir('treeROC');
+	mkdir(sprintf('%sROC', cType));
 	auc_vec = zeros(1,41);
 
 
@@ -8,15 +8,15 @@ function [auc_vec] = plotROC(classifier, trainLabels, score, trialNum)
 	diffscore = score(:, 1) - max(scoreMat, [], 2);
 
 	[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 1);
-	figure('name', sprintf('Classification Tree, trial %d User 1', trialNum),'visible', 'off');
+	figure('name', sprintf('%s, trial %d User 1', cType, trialNum),'visible', 'off');
 	plot(X,Y)
 	hold on
 	plot(OPTROCPT(1),OPTROCPT(2),'ro')
 	xlabel('False positive rate')
 	ylabel('True positive rate')
-	title(sprintf('ROC Curve Classification Trees, trial %d, user 1', trialNum));
+	title(sprintf('ROC %s, trial %d, user 1', cType, trialNum));
 	legend(['AUC=' num2str(AUC)], 'Operating Point');
-	saveas(gcf,sprintf('treeROC/ROC_Trees_trial_%d,_user_1.png', trialNum))
+	saveas(gcf,sprintf('%sROC/ROC_%s_trial_%d,_user_1.png', cType, cType, trialNum))
 	hold off
 
 	auc_vec(1) = AUC;
@@ -28,15 +28,15 @@ function [auc_vec] = plotROC(classifier, trainLabels, score, trialNum)
 
 
 		[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, k);
-		figure('name', sprintf('Classification Tree, trial %d User %d', trialNum, k), 'visible', 'off');
+		figure('name', sprintf('%s, trial %d User %d', cType, trialNum, k), 'visible', 'off');
 		plot(X,Y)
 		hold on
 		plot(OPTROCPT(1),OPTROCPT(2),'ro')
 		xlabel('False positive rate')
 		ylabel('True positive rate')
-		title(sprintf('ROC Curve Classification Trees, trial %d, user %d', trialNum, k));
+		title(sprintf('ROC %s, trial %d, user %d',cType, trialNum, k));
 		legend(['AUC=' num2str(AUC)], 'Operating Point');
-		saveas(gcf, sprintf('treeROC/ROC_Trees,_trial_%d,_user_%d.png', trialNum, k))
+		saveas(gcf, sprintf('%sROC/ROC_%s_trial_%d,_user_%d.png',cType , cType, trialNum, k))
 		hold off
 
 		auc_vec(k) = AUC;
@@ -49,15 +49,15 @@ function [auc_vec] = plotROC(classifier, trainLabels, score, trialNum)
 	diffscore = score(:, 41) - max(scoreMat, [], 2);
 
 	[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 41);
-	figure('name', sprintf('Classification Tree, trial %d User 41', trialNum));
+	figure('name', sprintf('%s, trial %d User 41', cType, trialNum), 'visible', 'off');
 	plot(X,Y)
 	hold on
 	plot(OPTROCPT(1),OPTROCPT(2),'ro')
 	xlabel('False positive rate')
 	ylabel('True positive rate')
-	title(sprintf('ROC Curve Classification Trees, trial %d, user 41', trialNum));
+	title(sprintf('ROC %s, trial %d, user 41', cType,  trialNum));
 	legend(['AUC=' num2str(AUC)], 'Operating Point');
-	saveas(gcf,sprintf('treeROC/ROC_Trees_trial_%d,_user_41.png', trialNum))
+	saveas(gcf,sprintf('%sROC/ROC_%s_trial_%d,_user_41.png', cType, cType, trialNum))
 	hold off
 
 	auc_vec(41) = AUC;
