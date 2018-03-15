@@ -48,23 +48,9 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 
 			case 'lda'
 				classifier_lda = fitcdiscr(trainSet, trainLabels);
-				
-
-
 				[~,score] = resubPredict(classifier_lda);
-				scoreMat = score(:, [1, 3:end]);
-				diffscore = score(:, 2) - max(scoreMat, [], 2);
-
-
-				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 2);
-				figure(1);
-				plot(X,Y)
-				hold on
-				plot(OPTROCPT(1),OPTROCPT(2),'ro')
-				xlabel('False positive rate')
-				ylabel('True positive rate')
-				title('ROC Curve for Classification by LDA')
-				hold off
+				auc_vec = plotROC(classifier_lda, trainLabels, score, i, 'LDAclassification');
+				auc_super(i, :) = auc_vec;
 
 				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
 				super_acc(i,:) = accuracy_vec;
@@ -115,39 +101,16 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 				knn_classifer = fitcknn(trainSet, trainLabels, 'NumNeighbors', 20, 'Standardize', 1);
 				
 				[~,score] = resubPredict(knn_classifer);
-				scoreMat = score(:, [1, 3:end]);
-				diffscore = score(:, 2) - max(scoreMat, [], 2);
-
-
-				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 2);
-				figure(1);
-				plot(X,Y)
-				hold on
-				plot(OPTROCPT(1),OPTROCPT(2),'ro')
-				xlabel('False positive rate')
-				ylabel('True positive rate')
-				title('ROC Curve for Classification by k-NN')
-				hold off
+				auc_vec = plotROC(knn_classifer, trainLabels, score, i, 'kNNclassification');
+				auc_super(i, :) = auc_vec;
 
 
 			case 'nb'
 
 				nb_classifier = fitcnb(trainSet, trainLabels);
-				
 				[~,score] = resubPredict(nb_classifier);
-				scoreMat = score(:, [1:3, 5:end]);
-				diffscore = score(:, 4) - max(scoreMat, [], 2);
-
-
-				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,diffscore, 4);
-				figure(1);
-				plot(X,Y)
-				hold on
-				plot(OPTROCPT(1),OPTROCPT(2),'ro')
-				xlabel('False positive rate')
-				ylabel('True positive rate')
-				title('ROC Curve for Classification by Naive Bayes')
-				hold off
+				auc_vec = plotROC(nb_classifier, trainLabels, score, i, 'NaiveBayes');
+				auc_super(i, :) = auc_vec;
 
 
 

@@ -24,7 +24,7 @@ for j = 1:N  %From user 1 to user N
 	count = 1;	%Counter to store labels in right place
 	
 	% Creates the vector of labels for the first 37 strokes
-	vector_label = predict(classifier.Trained{1}, testSet(predict_start:predict_end,:));
+	vector_label = predict(classifier, testSet(predict_start:predict_end,:));
 	
 	for k = 1:M
 		temp_vec = vector_label(1:k); 	%takes a subset of the vector
