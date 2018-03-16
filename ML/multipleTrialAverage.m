@@ -55,44 +55,7 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
 				super_acc(i,:) = accuracy_vec;
 			case 'svm'
-				cType = 'SVM';
-				[testSet, trainSet, user] = svmSplit(fullMatrix, 41);
-				userTest_indices = find(testSet(:,1) == user);
-				userTrain_indices = find(trainSet(:,1) == user);
-
-				testLabels = testSet(:,1);
-				testSet(:,1:2) = [];
-				testSet = normr(testSet);
-
-				trainLabels = trainSet(:,1);
-				trainSet(:,1:2) = [];
-				trainSet = normr(trainSet);
-
-
-				testLabels(:) = 0;
-				trainLabels(:) = 0;
-
-				testLabels(userTest_indices) = 1;
-				trainLabels(userTrain_indices) = 1;
-
-
-				svm_classifier = fitcsvm(trainSet, trainLabels, 'Standardize',true, 'KernelFunction', 'rbf', 'KernelScale','auto');
-				svm_classifier = fitPosterior(svm_classifier);
-				[~,score] =  resubPredict(svm_classifier);
-				%[label, score] = predict(svm_classifier, testSet(1:end,:));
-
-				[X,Y,T,AUC, OPTROCPT] = perfcurve(trainLabels,score(:,2),1);
-				figure('name', sprintf('%s, trial %d User %d', cType, i, user));
-				%figure(1)
-				plot(X,Y)
-				hold on
-				plot(OPTROCPT(1),OPTROCPT(2),'ro')
-				xlabel('False positive rate')
-				ylabel('True positive rate')
-				title(sprintf('ROC %s, trial %d, user %d',cType, i, user));
-				legend(['AUC=' num2str(AUC)], 'Operating Point');
-				%saveas(gcf, sprintf('%sROC/ROC_%s_trial_%d,_user_%d.png',cType , cType, trialNum, user))
-				hold off
+				svmROC(fullMatrix, 41);
 
 				%classLoss = kfoldLoss(svm_classifier);
 				%{
@@ -120,38 +83,51 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 
 
 			case 'svm2'
-
-				userTest_indices = find(testLabels(:,1) == i);
-				userTrain_indices = find(trainLabels(:,1) == i);
-
-				testLabels(:) = 0;
-				trainLabels(:) = 0;
-
-				testLabels(userTest_indices) = 1;
-				trainLabels(userTrain_indices) = 1;
-
-				svm_classifier = fitcsvm(trainSet, trainLabels, 'Standardize',true, 'KernelFunction', 'rbf', 'KernelScale','auto');
-				svm_classifier = fitPosterior(svm_classifier);
-				[~,score] =  resubPredict(svm_classifier);
-				%[label, score] = predict(svm_classifier, testSet(1:end,:));
-
-				[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,score(:,2),1);
-				figure(i)
-				plot(X,Y)
-				hold on
-				plot(OPTROCPT(1),OPTROCPT(2),'ro')
-				xlabel('False positive rate')
-				ylabel('True positive rate')
-				legend(['AUC=' num2str(AUC)], 'Operating Point');
-
-				%classLoss = kfoldLoss(svm_classifier);
-				%[accuracy, far, frr] = svmStrokeDistribution(svm_classifier, numUsers, 1, testSet, testLabels);
-				%super_acc(i, 1) = accuracy;
-				%super_acc(i, 2) = far;
-				%super_acc(i, 3) = frr;
+				cType = 'SVM';
+				labelsTest = testLabels;
+				labelsTrain = trainLabels;
 
 
+				mkdir(sprintf('%sROC', cType))
+				for k = 1:41
 
+					testLabels = labelsTest;
+					trainLabels = labelsTrain;
+
+					userTest_indices = find(testLabels(:,1) == k);
+					userTrain_indices = find(trainLabels(:,1) == k);
+
+					testLabels(:) = 0;
+					trainLabels(:) = 0;
+
+					testLabels(userTest_indices) = 1;
+					trainLabels(userTrain_indices) = 1;
+
+					svm_classifier = fitcsvm(trainSet, trainLabels, 'Standardize',true, 'KernelFunction', 'rbf', 'KernelScale','auto');
+					svm_classifier = fitPosterior(svm_classifier);
+					[~,score] =  resubPredict(svm_classifier);
+					%[label, score] = predict(svm_classifier, testSet(1:end,:));
+
+					[X,Y,T,AUC,OPTROCPT] = perfcurve(trainLabels,score(:,2),1);
+					figure('name', sprintf('%s, trial %d User %d', cType, i, k), 'visible', 'off');
+					%figure(1)
+					plot(X,Y)
+					hold on
+					plot(OPTROCPT(1),OPTROCPT(2),'ro')
+					xlabel('False positive rate')
+					ylabel('True positive rate')
+					title(sprintf('ROC %s, trial %d, user %d',cType, i, k));
+					legend(['AUC=' num2str(AUC)], 'Operating Point');
+					saveas(gcf, sprintf('%sROC/ROC_%s_trial_%d,_user_%d.png',cType , cType, i, k))
+					hold off
+
+
+					auc_super(i,k) = AUC;
+				end
+
+				
+
+				
 
 		end
 		
