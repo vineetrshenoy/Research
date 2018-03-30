@@ -39,7 +39,7 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 			case 'tree'
 				tree = fitctree(trainSet, trainLabels);
 				[~,score] = resubPredict(tree);
-				auc_vec = plotROC(tree, trainLabels, score, i, 'ClassificationTree');
+				auc_vec = plotROC(tree, trainLabels, score, i, 'ClassificationTreePolar');
 				auc_super(i, :) = auc_vec;
 				
 				accuracy_vec = treeStrokeDistribution(tree, numUsers, testSet, testLabels);
@@ -49,7 +49,7 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 			case 'lda'
 				classifier_lda = fitcdiscr(trainSet, trainLabels);
 				[~,score] = resubPredict(classifier_lda);
-				auc_vec = plotROC(classifier_lda, trainLabels, score, i, 'LDAclassification');
+				auc_vec = plotROC(classifier_lda, trainLabels, score, i, 'LDAclassificationPolar');
 				auc_super(i, :) = auc_vec;
 
 				accuracy_vec = ldaStrokeDistribution(classifier_lda, numUsers, testSet, testLabels);
@@ -70,7 +70,7 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 				knn_classifer = fitcknn(trainSet, trainLabels, 'NumNeighbors', 20, 'Standardize', 1);
 				
 				[~,score] = resubPredict(knn_classifer);
-				auc_vec = plotROC(knn_classifer, trainLabels, score, i, 'kNNclassification');
+				auc_vec = plotROC(knn_classifer, trainLabels, score, i, 'kNNclassificationPolar');
 				auc_super(i, :) = auc_vec;
 
 
@@ -78,12 +78,12 @@ function [super_acc, avg] = multipleTrialAverage(fullMatrix, numTrials, numUsers
 
 				nb_classifier = fitcnb(trainSet, trainLabels);
 				[~,score] = resubPredict(nb_classifier);
-				auc_vec = plotROC(nb_classifier, trainLabels, score, i, 'NaiveBayes');
+				auc_vec = plotROC(nb_classifier, trainLabels, score, i, 'NaiveBayesPolar');
 				auc_super(i, :) = auc_vec;
 
 
 			case 'svm2'
-				cType = 'SVM';
+				cType = 'SVMPolar';
 				labelsTest = testLabels;
 				labelsTrain = trainLabels;
 
